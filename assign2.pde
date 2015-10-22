@@ -2,7 +2,6 @@ PImage bg1, bg2, enemy, fighter, hp, treasure, start1, start2, end1, end2;
 int bg, enX, enY, hps, trX, trY, ftX, ftY;
 float speed;
 boolean upPressed=false, downPressed=false, leftPressed=false, rightPressed=false;
-boolean hpUp=false, hpDown=false;
 final int START=0, PLAYING=1, END=2;
 int gameState;
 
@@ -22,10 +21,6 @@ void setup () {
   bg=0;
   speed=0;
   gameState=START;
-  hps=204*2/10;
-  
-  if(hpUp){hps+=204/10;}
-  if(hpDown){hps-=204*2/10;}
 }
 
 void draw() {
@@ -34,18 +29,16 @@ void draw() {
   image(start2,0,0);
   if(mouseX<=450 && mouseX>=200 && mouseY<=430 && mouseY>=380){
    if(mousePressed){gameState=PLAYING;}
-   else{image(start1,0,0);}
-  }
-    if(hpUp){hps+=204/10;}
-  if(hpDown){hps-=204*2/10;}
-  ftX=580;
-  ftY=260;
-  trX=floor(random(0,600));
-  trY=floor(random(45,440));
-  enY=floor(random(45,440));
-  enX=0;
+   else{image(start1,0,0);}}
+  //restart
+   ftX=580;
+   ftY=260;
+   trX=floor(random(0,600));
+   trY=floor(random(45,430));
+   enY=floor(random(45,430));
+   enX=0;
+   hps=199*2/10;
   break;
- 
  
   case PLAYING:
   //background
@@ -57,22 +50,42 @@ void draw() {
 
   //treasure
    image(treasure, trX, trY);
-
-   if(trX+50>=ftX+50 && ftX+50>=trX && trY-50<=ftY && ftY<=trY+50){hpUp=true;}
-   if(trY+50>=ftY+50 && ftY+50>=trY && trX-50<=ftX && ftX<=trX+50){hpUp=true;}
-   if(ftX+50>=trX+50 && trX+50>=ftX && ftY-50<=trY && trY<=ftY+50){hpUp=true;}
-   if(ftY+50>=trY+50 && trY+50>=ftY && ftX-50<=trX && trX<=ftX+50){hpUp=true;}
-  
+   if(trY+50>=ftY && ftY>=trY-50){
+    if(trX-50<=ftX && ftX<=trX+50){
+     image(treasure, trX, trY);
+     trY=floor(random(45,430));
+     trX=floor(random(0,600));
+     hps+=199/10;
+     if(hps>=199){
+     hps=199;}}}
+     
   //enemy
+   //move 
    enX+=3;
    enX%=640;
-   image(enemy, enX, enY);
+   if(upPressed){
+    if(enY+25>ftY+25){enY-=(speed-2);}
+    else{enY+=(speed-2);}}
+   else if(downPressed){
+    if(enY+25<ftY+25){enY+=(speed-2);}
+    else{enY-=(speed-2);}}
+   else if(enY+25==ftY+25){enY+=0;}
+   else{
+    if(enY+25>ftY+25){enY-=(speed-2);}
+    else{enY+=(speed-2);}} 
+    image(enemy, enX, enY);
+    if(enX==0){
+     image(enemy, enX, enY);
+     enY=floor(random(45,430));
+     enX=0;}
+   //boundary
+    if(enY>height-50){enY=height-50;}
+    if(enY<0){enY=0;}
   
   //fighter
    //move
     speed++;
-    speed%=7;
-    if(speed==7){speed=7;}
+    if(speed>=4){speed=4;}
     if(upPressed){ftY-=speed;}
     if(downPressed){ftY+=speed;} 
     if(leftPressed){ftX-=speed;}
@@ -95,21 +108,25 @@ void draw() {
     gameState=END;}
    
   //crash
-   if(enX+50>=ftX+50 && ftX+50>=enX && enY-50<=ftY && ftY<=trY+50){gameState=END;}
-   if(enY+50>=ftY+50 && ftY+50>=enY && enX-50<=ftX && ftX<=trX+50){gameState=END;}
-   if(ftX+50>=enX+50 && enX+50>=ftX && ftY-50<=enY && enY<=ftY+50){gameState=END;}
-   if(ftY+50>=enY+50 && enY+50>=ftY && ftX-50<=enX && enX<=ftX+50){gameState=END;}
+   image(enemy, enX, enY);
+   if(enY+50>=ftY && ftY>=enY-50){
+    if(enX-50<=ftX && ftX<=enX+50){
+     image(enemy, enX, enY);
+     enY=floor(random(45,430));
+     enX=0;
+     hps-=2*199/10;}}
  break;
  
  case END:
   image(end2,0,0);
- if(mouseX<=450 && mouseX>=200 && mouseY<=350 && mouseY>=320){
+  if(mouseX<=450 && mouseX>=200 && mouseY<=350 && mouseY>=320){
    if(mousePressed){gameState=START;}
    else{image(end1,0,0);}
  break;
  }
 }
 }
+
 void keyPressed(){
   if(key==CODED){
     switch(keyCode){
@@ -143,8 +160,7 @@ void keyReleased(){
     break;
     case RIGHT:
     rightPressed = false;
-    break;
-    
+    break; 
   }
   }
 }
