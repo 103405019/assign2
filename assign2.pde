@@ -65,16 +65,19 @@ void draw() {
    enX%=640;
    if(upPressed){
     if(enY+25>ftY+25){enY-=(speed-2);}
-    else{enY+=(speed-2);}}
+    if(enY+25<ftY+25){enY+=(speed-2);}
+    else if(enY+25==ftY+25){enY=ftY;}}
    else if(downPressed){
     if(enY+25<ftY+25){enY+=(speed-2);}
-    else{enY-=(speed-2);}}
-   else if(enY+25==ftY+25){enY+=0;}
+    if(enY+25>ftY+25){enY-=(speed-2);}
+    else if(enY+25==ftY+25){enY=ftY;}}
+   else if(enY+25==ftY+25){enY=ftY;}
    else{
     if(enY+25>ftY+25){enY-=(speed-2);}
-    else{enY+=(speed-2);}} 
+    if(enY+25<ftY+25){enY+=(speed-2);}
+    else if(enY+25==ftY+25){enY=ftY;}} 
     image(enemy, enX, enY);
-    if(enX==0){
+    if(enX==640){
      image(enemy, enX, enY);
      enY=floor(random(45,430));
      enX=0;}
